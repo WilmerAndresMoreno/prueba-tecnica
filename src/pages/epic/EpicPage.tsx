@@ -1,4 +1,4 @@
-export default function EpicPage() {
+export function EpicPage() {
 	return (
 		<>
 			<h1>EpicPage</h1>
