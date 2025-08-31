@@ -1,6 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { ApodPage, EpicPage, FavoritesPage, MarsPage, NeoPage, NotFound } from '../../pages'
 import AppLayout from '../AppLayout'
+import { lazy } from 'react'
+
+const ApodPage = lazy(() => import('@/pages/apod/ApodPage'))
+const EpicPage = lazy(() => import('@/pages/epic/EpicPage'))
+const FavoritesPage = lazy(() => import('@/pages/favorites/FavoritesPage'))
+const MarsPage = lazy(() => import('@/pages/mars/MarsPage'))
+const NeoPage = lazy(() => import('@/pages/neo/NeoPage'))
+const NotFound = lazy(() => import('@/pages/not-found/not-found'))
 
 export const router = createBrowserRouter([
 	{
