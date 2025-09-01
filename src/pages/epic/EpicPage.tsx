@@ -1,4 +1,3 @@
-// src/pages/EpicPage.tsx
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SelectButton } from 'primereact/selectbutton'
@@ -10,8 +9,6 @@ import { useQuery } from '@tanstack/react-query'
 import { nasa } from '@/shared/api/nasa'
 import type { EpicItem } from '@/shared/api/types/epic'
 import type { HttpError } from '@/shared/api/http'
-
-/* ───────── utilidades ───────── */
 
 type Mode = 'today' | 'date'
 
@@ -33,12 +30,9 @@ const parseYMD = (s: string | null): Date | null => {
 
 type CalendarOnChangeSingle = NonNullable<CalendarProps<'single', Date>['onChange']>
 
-/* ───────── componente ───────── */
-
 export default function EpicPage() {
 	const [searchParams, setSearchParams] = useSearchParams()
 
-	// hoy normalizado
 	const today = useMemo(() => {
 		const t = new Date()
 		t.setHours(0, 0, 0, 0)
@@ -46,7 +40,6 @@ export default function EpicPage() {
 	}, [])
 	const todayStr = useMemo(() => toYMD(today), [today])
 
-	// estado de controles (borrador)
 	const [mode, setMode] = useState<Mode>((searchParams.get('mode') as Mode) || 'today')
 	const [date, setDate] = useState<Date | null>(() => parseYMD(searchParams.get('date')))
 	const onDateChange: CalendarOnChangeSingle = (e) => {
@@ -54,11 +47,9 @@ export default function EpicPage() {
 		setDate(v instanceof Date ? v : null)
 	}
 
-	// consulta gobernada por URL
 	const qMode: Mode = (searchParams.get('mode') as Mode) || 'today'
 	const qDateStr = searchParams.get('date') || ''
 
-	// queries (error tipado como HttpError)
 	const qToday = useQuery<EpicItem[], HttpError>({
 		queryKey: ['epic', 'byDate', todayStr],
 		queryFn: ({ signal }) => nasa.epic.byDate(todayStr, signal),
@@ -73,10 +64,9 @@ export default function EpicPage() {
 		staleTime: 60_000,
 	})
 
-	// fallback a “último disponible”
 	const [useLatest, setUseLatest] = useState<boolean>(false)
 	useEffect(() => {
-		setUseLatest(false) // resetea si cambian parámetros de URL
+		setUseLatest(false)
 	}, [qMode, qDateStr])
 
 	const qLatest = useQuery<EpicItem[], HttpError>({
@@ -86,7 +76,6 @@ export default function EpicPage() {
 		staleTime: 60_000,
 	})
 
-	// datos/estados activos
 	const activeData: EpicItem[] | undefined = useLatest ? qLatest.data : qMode === 'today' ? qToday.data : qByDate.data
 
 	const activeLoading = useLatest ? qLatest.isLoading : qMode === 'today' ? qToday.isLoading : qByDate.isLoading
@@ -94,7 +83,6 @@ export default function EpicPage() {
 	const activeError: HttpError | null =
 		(useLatest ? qLatest.error : qMode === 'today' ? qToday.error : qByDate.error) ?? null
 
-	// hooks que antes estaban después del return condicional → súbelos aquí
 	const [openIdx, setOpenIdx] = useState<number | null>(null)
 	const displayDay = useMemo(() => {
 		if (!activeData || activeData.length === 0) return ''
@@ -102,10 +90,8 @@ export default function EpicPage() {
 		return d ?? ''
 	}, [activeData])
 
-	// bandera para no hacer return temprano (evita violar reglas de hooks)
 	const is503 = activeError?.status === 503
 
-	// botón Buscar → vuelca controles a la URL
 	const canSearch = mode === 'today' || (mode === 'date' && Boolean(date))
 	const onSearch = () => {
 		const next = new URLSearchParams()
@@ -117,7 +103,6 @@ export default function EpicPage() {
 	return (
 		<main className='space-y-6'>
 			{is503 ? (
-				// ───── Vista 503 (solo imagen) ─────
 				<div className='min-h-[60vh] flex items-center justify-center p-6'>
 					<img
 						src='/503.svg'
@@ -128,9 +113,7 @@ export default function EpicPage() {
 					/>
 				</div>
 			) : (
-				// ───── Vista normal ─────
 				<>
-					{/* Encabezado */}
 					<header className='space-y-1'>
 						<h1 className='text-3xl font-extrabold tracking-tight'>
 							<span className='bg-gradient-to-r from-sky-500 to-violet-600 bg-clip-text text-transparent'>
@@ -144,7 +127,6 @@ export default function EpicPage() {
 						</p>
 					</header>
 
-					{/* Controles */}
 					<section
 						aria-labelledby='controls-heading'
 						className='rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-4'
@@ -211,7 +193,6 @@ export default function EpicPage() {
 						</div>
 					</section>
 
-					{/* Resultados */}
 					<section aria-labelledby='results-heading'>
 						<h2 id='results-heading' className='sr-only'>
 							Resultados EPIC
