@@ -254,10 +254,29 @@ export default function NeoPage() {
 					}
 					loading={isLoading}
 				>
-					<Column field='name' header='Nombre' body={nameBody} sortable headerClassName='text-slate-900' />
-					<Column field='approachDate' header='Aproximación' sortable headerClassName='text-slate-900' />
-					<Column header={hazardousHeader} body={hazardousBody} headerStyle={{ minWidth: '220px' }} />
 					<Column
+						style={{ width: '20%' }}
+						field='name'
+						header='Nombre'
+						body={nameBody}
+						sortable
+						headerClassName='text-slate-900'
+					/>
+					<Column
+						style={{ width: '20%' }}
+						field='approachDate'
+						header='Aproximación'
+						sortable
+						headerClassName='text-slate-900'
+					/>
+					<Column
+						style={{ width: '20%' }}
+						header={hazardousHeader}
+						body={hazardousBody}
+						headerStyle={{ minWidth: '220px' }}
+					/>
+					<Column
+						style={{ width: '20%' }}
 						field='missKm'
 						header='Distancia mínima (km)'
 						body={missBody}
@@ -265,6 +284,7 @@ export default function NeoPage() {
 						headerClassName='text-slate-900'
 					/>
 					<Column
+						style={{ width: '20%' }}
 						field='velKps'
 						header='Velocidad (km/s)'
 						body={velBody}
