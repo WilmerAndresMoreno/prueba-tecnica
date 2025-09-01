@@ -27,7 +27,7 @@ El proyecto es una aplicación frontend (React + Vite + TypeScript) que consume 
 
 ## Demo
 
-- Deploy público: [Enlace directo a la aplicación desplegada en Vercel](https://prueba-tecnica-qejqugder-wilmermorenos-projects.vercel.app/)
+- Deploy público: [Enlace directo a la aplicación desplegada en Vercel](https://prueba-tecnica-two-gamma.vercel.app/)
 
 ---
 
