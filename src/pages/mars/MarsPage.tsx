@@ -11,8 +11,6 @@ import { Button } from 'primereact/button'
 import { useMarsEarthDate, useMarsSol } from '@/features/mars/hooks'
 import type { MarsPhotosResponse, MarsPhoto } from '@/shared/api/types/mars'
 
-/* ───────────── Config ───────────── */
-
 const ROVERS = ['curiosity', 'opportunity', 'spirit'] as const
 type Rover = (typeof ROVERS)[number]
 type Mode = 'date' | 'sol'
@@ -41,8 +39,6 @@ const COMPATIBLE: Record<Rover, ReadonlySet<CameraCode>> = {
 const PER_PAGE = 25
 const FAV_KEY = 'mars:favorites'
 
-/* ───────────── Utils ───────────── */
-
 const toYMD = (d: Date): string => {
 	const y = d.getFullYear()
 	const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -58,15 +54,11 @@ const parseYMD = (s: string | null): Date | null => {
 	return dt
 }
 
-/* ───────── Tipos de eventos (sin any) ───────── */
-
 type CalendarOnChangeSingle = NonNullable<CalendarProps<'single', Date>['onChange']>
 type PaginatorOnChange = NonNullable<React.ComponentProps<typeof Paginator>['onPageChange']>
 type DropdownOnChange = NonNullable<React.ComponentProps<typeof Dropdown>['onChange']>
 type SelectButtonOnChange = NonNullable<React.ComponentProps<typeof SelectButton>['onChange']>
 type InputNumberOnValueChange = NonNullable<React.ComponentProps<typeof InputNumber>['onValueChange']>
-
-/* ───────── Favoritos ───────── */
 
 type FavPhoto = Pick<MarsPhoto, 'id' | 'img_src' | 'earth_date' | 'sol'> & {
 	rover: { name: MarsPhoto['rover']['name'] }
@@ -85,19 +77,15 @@ const saveFavs = (list: FavPhoto[]) => {
 	localStorage.setItem(FAV_KEY, JSON.stringify(list))
 }
 
-/* ───────────── Componente ───────────── */
-
 export default function MarsPage() {
 	const [searchParams, setSearchParams] = useSearchParams()
 
-	// CONTROLES (borrador)
 	const [rover, setRover] = useState<Rover>((searchParams.get('rover') as Rover) || 'curiosity')
 	const [mode, setMode] = useState<Mode>((searchParams.get('mode') as Mode) || 'date')
 	const [earthDate, setEarthDate] = useState<Date | null>(parseYMD(searchParams.get('date')))
 	const [sol, setSol] = useState<number | null>(searchParams.get('sol') ? Number(searchParams.get('sol')) : null)
 	const [camera, setCamera] = useState<CameraValue>((searchParams.get('camera') as CameraValue) || '')
 
-	// URL (consulta activa)
 	const qMode: Mode = (searchParams.get('mode') as Mode) || 'date'
 	const qRover: Rover = (searchParams.get('rover') as Rover) || 'curiosity'
 	const qPage = Math.max(1, Number(searchParams.get('page') || 1))
@@ -108,7 +96,6 @@ export default function MarsPage() {
 	const qEarthDateStr = searchParams.get('date') || ''
 	const qSol = searchParams.get('sol') ? Number(searchParams.get('sol')) : NaN
 
-	// llamadas a API governadas por URL
 	const qDate = useMarsEarthDate(qRover, qEarthDateStr, qCameraParam, qPage)
 	const qSolQ = useMarsSol(qRover, qSol, qCameraParam, qPage)
 	const enabledByDate = qMode === 'date' && !!qEarthDateStr
@@ -118,14 +105,12 @@ export default function MarsPage() {
 	const isLoading = enabledByDate ? qDate.isLoading : enabledBySol ? qSolQ.isLoading : false
 	const error = enabledByDate ? qDate.error : enabledBySol ? qSolQ.error : undefined
 
-	// hoy para limitar calendario
 	const today = useMemo(() => {
 		const t = new Date()
 		t.setHours(0, 0, 0, 0)
 		return t
 	}, [])
 
-	// opciones de cámara (compatibles por rover)
 	const cameraOptions = useMemo(
 		() => [
 			{ label: 'Todas las cámaras', value: 'ALL' as CameraValue },
@@ -140,7 +125,6 @@ export default function MarsPage() {
 		[rover]
 	)
 
-	// (1) Buscar habilitado si y solo si el modo actual tiene su valor correspondiente
 	const canSearch = mode === 'date' ? Boolean(earthDate) : Number.isFinite(sol ?? NaN)
 
 	const onSearch = () => {
@@ -160,7 +144,6 @@ export default function MarsPage() {
 		setSearchParams(next, { replace: false })
 	}
 
-	// handlers tipados
 	const onCalendarChange: CalendarOnChangeSingle = (e) => {
 		const v = e.value
 		setEarthDate(v instanceof Date ? v : null)
@@ -171,13 +154,11 @@ export default function MarsPage() {
 	const onRoverChange: SelectButtonOnChange = (e) => setRover(e.value as Rover)
 	const onCameraChange: DropdownOnChange = (e) => setCamera(e.value as CameraValue)
 
-	// limpiar el otro campo al cambiar de modo (UX)
 	useEffect(() => {
 		if (mode === 'date') setSol(null)
 		else setEarthDate(null)
 	}, [mode])
 
-	// (2) Favoritos con persistencia local
 	const [favs, setFavs] = useState<FavPhoto[]>(() => loadFavs())
 	const favIds = useMemo(() => new Set(favs.map((f) => f.id)), [favs])
 
@@ -199,7 +180,6 @@ export default function MarsPage() {
 		})
 	}
 
-	// diálogo por id
 	const [openId, setOpenId] = useState<number | null>(null)
 
 	return (
@@ -216,7 +196,6 @@ export default function MarsPage() {
 				</p>
 			</header>
 
-			{/* Filtros */}
 			<section
 				aria-labelledby='filters-heading'
 				className='rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-4'
@@ -226,7 +205,6 @@ export default function MarsPage() {
 				</h2>
 
 				<div className='grid gap-4 md:grid-cols-2'>
-					{/* Rover + cámara */}
 					<div className='space-y-3'>
 						<div>
 							<label htmlFor='rover' className='block text-sm font-medium text-slate-900'>
@@ -270,7 +248,6 @@ export default function MarsPage() {
 						</div>
 					</div>
 
-					{/* Fecha/Sol + Buscar */}
 					<div className='space-y-3'>
 						<div>
 							<label htmlFor='mode' className='block text-sm font-medium text-slate-900'>
@@ -335,7 +312,6 @@ export default function MarsPage() {
 				</div>
 			</section>
 
-			{/* Resultados */}
 			<section aria-labelledby='results-heading'>
 				<h2 id='results-heading' className='sr-only'>
 					Resultados
@@ -384,7 +360,6 @@ export default function MarsPage() {
 													/>
 												</button>
 
-												{/* (2) Botón Favorito en esquina inferior izquierda */}
 												<button
 													type='button'
 													onClick={(e) => {
@@ -412,7 +387,6 @@ export default function MarsPage() {
 											</div>
 										</article>
 
-										{/* Dialog detalle */}
 										<Dialog
 											id={dialogId}
 											header={`${p.rover.name} · ${p.camera.full_name}`}
@@ -474,7 +448,6 @@ export default function MarsPage() {
 				)}
 			</section>
 
-			{/* (3) Sección de favoritos */}
 			<section aria-labelledby='favorites-heading' className='mt-10'>
 				<div className='flex items-baseline justify-between'>
 					<h2 id='favorites-heading' className='text-lg font-semibold text-slate-900'>

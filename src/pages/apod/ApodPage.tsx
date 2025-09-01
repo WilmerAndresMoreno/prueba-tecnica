@@ -148,6 +148,19 @@ export default function ApodPage() {
 									breakpoints={{ '960px': '85vw', '641px': '100vw' }}
 									draggable={false}
 									resizable={false}
+									blockScroll
+									dismissableMask
+									closeOnEscape
+									pt={{
+										mask: {
+											style: {
+												background: 'rgba(2, 6, 23, 0.16)',
+												backdropFilter: 'blur(6px)',
+												WebkitBackdropFilter: 'blur(6px)',
+												transition: 'backdrop-filter .2s ease, background .2s ease',
+											},
+										},
+									}}
 								>
 									<figure className='m-0'>
 										<img
